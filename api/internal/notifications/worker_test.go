@@ -93,7 +93,7 @@ func TestOutboxDeliveryPreferencesAndAccess(t *testing.T) {
 		t.Fatal("delivery must delete its entry and link to the comment")
 	}
 
-	if got := sender.messages[0]; got.DocumentTitle != "Private" || got.Highlight != "Review" || got.Body != "@Owner" || got.Reply {
+	if got := sender.messages[0]; got.DocumentTitle != "Private" || got.Highlight != "Review" || got.Body != "@Owner" || got.Author != "Author (author@example.com)" || got.Reply {
 		t.Fatalf("wrong comment context: %+v", got)
 	}
 
@@ -233,7 +233,7 @@ func TestOutboxDeliveryPreferencesAndAccess(t *testing.T) {
 	if count() != 0 || !strings.Contains(sender.links[len(sender.links)-1], reply.ID) {
 		t.Fatal("reply notification missing")
 	}
-	if got := sender.messages[len(sender.messages)-1]; got.Highlight != "Review" || got.Body != "Reply" || !got.Reply {
+	if got := sender.messages[len(sender.messages)-1]; got.Highlight != "Review" || got.Body != "Reply" || got.Author != "Author (author@example.com)" || !got.Reply {
 		t.Fatalf("reply must include root highlight and reply body: %+v", got)
 	}
 

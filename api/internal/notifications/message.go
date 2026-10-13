@@ -51,13 +51,7 @@ func slackMessage(channel string, message Message) map[string]any {
 	}
 	highlight := notificationPreview(message.Highlight, 600)
 	body := notificationPreview(message.Body, 2200)
-	activity := "💬 Someone commented on your doc"
-	if message.Reply {
-		activity = "💬 Someone replied to a comment on your doc"
-	}
-	if message.Reason == "mention" {
-		activity = "🔔 Someone mentioned you in a comment"
-	}
+	activity := commentActivity(message)
 	text := func(value string) map[string]any {
 		return map[string]any{"type": "text", "text": value}
 	}
@@ -95,14 +89,32 @@ func slackMessage(channel string, message Message) map[string]any {
 	}
 }
 
-func slackAccessMessage(channel, title string, message Message) map[string]any {
-	activity := "🔐 Your document access changed"
+// commentActivity is the provider-neutral headline for comment activity. The
+// author is user-controlled text, so it is masked and bounded like the body.
+func commentActivity(message Message) string {
+	author := notificationPreview(message.Author, 300)
+	if author == "" {
+		author = "Someone"
+	}
+	if message.Reason == "mention" {
+		return "🔔 " + author + " mentioned you in a comment"
+	}
+	if message.Reply {
+		return "💬 " + author + " replied to a comment on your doc"
+	}
+	return "💬 " + author + " commented on your doc"
+}
+
+// accessSummary is the provider-neutral wording for access notifications. An
+// empty buttonLabel means the recipient has nothing left to open.
+func accessSummary(message Message) (activity, detail, buttonLabel string) {
+	activity = "🔐 Your document access changed"
 	accessLabel := "Access"
 	if message.DirectAccess {
 		accessLabel = "Direct access"
 	}
-	detail := accessLabel + ": " + roleLabel(message.PreviousRole) + " → " + roleLabel(message.Role)
-	buttonLabel := "Open document"
+	detail = accessLabel + ": " + roleLabel(message.PreviousRole) + " → " + roleLabel(message.Role)
+	buttonLabel = "Open document"
 	switch message.Reason {
 	case "access_requested":
 		activity = "🔑 Someone requested access to your document"
@@ -120,7 +132,13 @@ func slackAccessMessage(channel, title string, message Message) map[string]any {
 			activity = "🔒 Your direct document access was removed"
 		}
 		detail = "Previous " + strings.ToLower(accessLabel) + ": " + roleLabel(message.PreviousRole)
+		buttonLabel = ""
 	}
+	return activity, detail, buttonLabel
+}
+
+func slackAccessMessage(channel, title string, message Message) map[string]any {
+	activity, detail, buttonLabel := accessSummary(message)
 	text := func(value string) map[string]any {
 		return map[string]any{"type": "text", "text": value}
 	}
@@ -138,7 +156,7 @@ func slackAccessMessage(channel, title string, message Message) map[string]any {
 			}},
 		}},
 	}
-	if message.Reason != "access_removed" {
+	if buttonLabel != "" {
 		blocks = append(blocks, map[string]any{"type": "actions", "elements": []any{
 			map[string]any{"type": "button", "text": map[string]any{"type": "plain_text", "text": buttonLabel, "emoji": false}, "url": message.Link, "style": "primary"},
 		}})
