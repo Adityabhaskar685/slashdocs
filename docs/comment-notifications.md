@@ -159,7 +159,7 @@ rechecks the recipient's current document access and notification settings befor
 sending a DM. Slack receives the document title, highlighted text, comment or
 reply content, and a button linking to that exact comment. Replies include the
 root thread's highlight. The activity leads the message and names the comment's
-author as "Name (email)", or whichever of the two is known, followed by
+author by name (or email when no name is known), followed by
 `Document: <title>` as a link, an italic Slack
 blockquote, the comment, and a prominent **View comment** button. Regular Block
 Kit blocks avoid the extra attribution footer Slack adds to attachments.

@@ -92,8 +92,8 @@ func TestGoogleChatWebhookRejectsForeignURLs(t *testing.T) {
 	}
 }
 
-func TestGoogleChatHeaderNamesAuthorAsPlainText(t *testing.T) {
-	payload := googleChatMessage(Message{Reason: "owner", Author: "Mallory <users/all>", DocumentTitle: "Plan", Body: "hi"}, "")
+func TestGoogleChatHeaderNamesActorAsPlainText(t *testing.T) {
+	payload := googleChatMessage(Message{Reason: "owner", Actor: "Mallory <users/all>", DocumentTitle: "Plan", Body: "hi"}, "")
 	card := payload["cardsV2"].([]any)[0].(map[string]any)["card"].(map[string]any)
 	header := card["header"].(map[string]any)
 	// Card headers are plain text in Chat, so markup stays literal rather than

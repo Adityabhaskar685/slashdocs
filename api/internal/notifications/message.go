@@ -90,19 +90,19 @@ func slackMessage(channel string, message Message) map[string]any {
 }
 
 // commentActivity is the provider-neutral headline for comment activity. The
-// author is user-controlled text, so it is masked and bounded like the body.
+// actor is user-controlled text, so it is masked and bounded like the body.
 func commentActivity(message Message) string {
-	author := notificationPreview(message.Author, 300)
-	if author == "" {
-		author = "Someone"
+	actor := notificationPreview(message.Actor, 150)
+	if actor == "" {
+		actor = "Someone"
 	}
 	if message.Reason == "mention" {
-		return "🔔 " + author + " mentioned you in a comment"
+		return "🔔 " + actor + " mentioned you in a comment"
 	}
 	if message.Reply {
-		return "💬 " + author + " replied to a comment on your doc"
+		return "💬 " + actor + " replied to a comment on your doc"
 	}
-	return "💬 " + author + " commented on your doc"
+	return "💬 " + actor + " commented on your doc"
 }
 
 // accessSummary is the provider-neutral wording for access notifications. An
